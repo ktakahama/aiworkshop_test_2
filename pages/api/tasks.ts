@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createTasksTable, getTasks, createTask, updateTaskStatus } from '../../lib/db';
+import { createTasksTable, getTasks, createTask, updateTaskStatus, deleteTask } from '../../lib/db';
 import { generateTasks } from '../../lib/openai';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -39,6 +39,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const updatedTask = await updateTaskStatus(id, completed);
       return res.status(200).json(updatedTask);
+    }
+
+    if (req.method === 'DELETE') {
+      const { id } = req.query;
+      if (!id || typeof parseInt(id as string) !== 'number') {
+        return res.status(400).json({ error: '無効なIDです' });
+      }
+
+      const deletedTask = await deleteTask(parseInt(id as string));
+      return res.status(200).json(deletedTask);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

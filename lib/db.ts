@@ -58,3 +58,17 @@ export async function updateTaskStatus(id: number, completed: boolean) {
     throw error;
   }
 }
+
+export async function deleteTask(id: number) {
+  try {
+    const { rows } = await sql`
+      DELETE FROM tasks
+      WHERE id = ${id}
+      RETURNING *;
+    `;
+    return rows[0];
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    throw error;
+  }
+}
